@@ -1,0 +1,66 @@
+@if (visible()) {
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in-fast" (click)="closeModal()">
+  <div class="bg-gradient-to-br from-[#2a205a] to-[#1a1a3a] p-8 rounded-2xl shadow-2xl border border-white/10 w-full max-w-sm" (click)="$event.stopPropagation()">
+    @if (!hasPassword()) {
+      <!-- Setup View -->
+      <form (ngSubmit)="setupVault()">
+        <h2 class="text-xl font-bold text-white mb-2">Create Your Vault</h2>
+        <p class="text-gray-400 mb-6 text-sm">Set a strong password to protect your sensitive files.</p>
+        
+        <div class="space-y-4 text-left">
+          <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="New Password" class="w-full bg-black/30 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-white/10">
+          <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Confirm Password" class="w-full bg-black/30 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-white/10">
+        </div>
+
+        <div class="mt-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg text-red-300 text-xs text-center">
+            <strong>Warning:</strong> If you forget this password, you will lose access to your vault forever. There is no recovery option.
+        </div>
+        
+        @if (error()) {
+          <p class="text-red-400 text-sm mt-4 text-center">{{ error() }}</p>
+        }
+
+        <div class="flex items-center space-x-3 mt-6">
+            <button type="button" (click)="closeModal()" class="w-full bg-black/20 hover:bg-white/10 text-gray-300 py-2.5 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg transition-colors font-semibold">
+              Create Vault
+            </button>
+        </div>
+      </form>
+    } @else {
+      <!-- Unlock View -->
+      <form (ngSubmit)="unlockVault()">
+        <h2 class="text-xl font-bold text-white mb-2">Unlock Vault</h2>
+        <p class="text-gray-400 mb-6 text-sm">Enter your password to access your secure files.</p>
+
+        <input type="password" [(ngModel)]="password" name="password" placeholder="Password" class="w-full bg-black/30 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-white/10">
+
+         @if (error()) {
+          <p class="text-red-400 text-sm mt-4 text-center">{{ error() }}</p>
+        }
+
+        <div class="flex items-center space-x-3 mt-6">
+            <button type="button" (click)="closeModal()" class="w-full bg-black/20 hover:bg-white/10 text-gray-300 py-2.5 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg transition-colors font-semibold">
+              Unlock
+            </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>
+}
+
+<style>
+  @keyframes fade-in-fast {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in-fast {
+    animation: fade-in-fast 0.2s ease-out;
+  }
+</style>

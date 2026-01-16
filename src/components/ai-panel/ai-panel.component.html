@@ -1,0 +1,85 @@
+<div class="h-full bg-black/20 rounded-lg p-3 backdrop-blur-lg border border-white/10 flex flex-col">
+  <!-- Top Section: Weather Widget & Settings -->
+  <div class="flex-shrink-0 mb-2">
+    <app-weather-widget [showSettings]="isSettingsOpen()"></app-weather-widget>
+  </div>
+  
+  <!-- Chat Messages Area -->
+  <div class="flex-grow overflow-y-auto mb-2 pr-2">
+    @if (!activeProvider()) {
+        <div class="flex h-full items-center justify-center text-center text-gray-400 p-4">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="mt-2 font-semibold text-gray-200 text-sm">Select an AI Provider</h3>
+                <p class="text-xs">Log in to an AI provider from the sidebar to begin.</p>
+            </div>
+        </div>
+    } @else if(messages().length === 0) {
+        <div class="flex h-full items-center justify-center text-center text-gray-400 p-4">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                <h3 class="mt-2 font-semibold text-gray-200 text-sm">COGNITION READY</h3>
+                <p class="text-xs">Start a conversation with {{activeProvider()?.name}}.</p>
+            </div>
+        </div>
+    } @else {
+        <div class="w-full text-left space-y-3 p-2">
+            @for(message of messages(); track $index) {
+            <div class="flex" [class.justify-end]="message.sender === 'user'">
+                <div class="max-w-xs md:max-w-md lg:max-w-lg p-2.5 rounded-lg text-white" [class.bg-purple-600]="message.sender === 'user'" [class.bg-gray-700]="message.sender === 'ai'">
+                <p class="text-sm">{{message.text}}</p>
+                </div>
+            </div>
+            }
+        </div>
+    }
+  </div>
+
+  <!-- Bottom Section: AI Controls -->
+  <div class="flex-shrink-0 flex flex-col bg-black/30 border border-white/10 rounded-lg p-2 space-y-2">
+      <!-- Model Selector -->
+      <div class="flex items-center justify-between relative">
+        <div class="flex items-center space-x-2">
+          <div class="h-2 w-2 rounded-full flex-shrink-0" [class.bg-green-400]="activeProvider()" [class.bg-gray-500]="!activeProvider()"></div>
+          <div class="min-w-0">
+            <h4 class="text-xs font-semibold text-gray-300 truncate">{{ activeProvider()?.name?.toUpperCase() || 'NO AI SELECTED' }}</h4>
+            <p class="text-xs text-gray-400 truncate">{{ selectedModel() }}</p>
+          </div>
+        </div>
+        <div class="flex items-center">
+            <button (click)="toggleDropdown()" [disabled]="!activeProvider()" class="p-1 rounded hover:bg-white/10 disabled:opacity-50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+             <button (click)="toggleSettings()" class="p-1 rounded hover:bg-white/10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.86 8.82H2.1c-1.63 0-2.34 2.02-1.09 3.09l4.63 3.37-1.78 5.65c-.5 1.58 1.28 2.92 2.64 1.94l4.9-3.57 4.9 3.57c1.36.98 3.14-.36 2.64-1.94l-1.78-5.65 4.63-3.37c1.25-1.07.54-3.09-1.09-3.09H12.14l-.65-5.65z" clip-rule="evenodd" transform="scale(0.8)"/></svg>
+            </button>
+        </div>
+        
+        @if(isDropdownOpen() && activeProvider()) {
+          <div class="absolute bottom-full right-0 mb-2 w-full bg-[#2c2c2c] border border-white/20 rounded-lg shadow-2xl z-10">
+            @for(model of activeProvider()?.models; track model) {
+              <a href="#" (click)="$event.preventDefault(); selectModel(model)" class="block px-3 py-2 text-sm hover:bg-white/10">{{ model }}</a>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Input Area -->
+      <div class="flex-shrink-0 relative">
+        <input 
+          [(ngModel)]="prompt" 
+          (keydown.enter)="sendMessage()"
+          [disabled]="isLoading() || !activeProvider()"
+          type="text" 
+          placeholder="{{ activeProvider() ? 'Type your request...' : 'Select an AI provider to begin' }}"
+          class="w-full bg-black/40 rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-transparent disabled:opacity-50">
+        <button (click)="sendMessage()" [disabled]="isLoading() || !activeProvider()" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600">
+          <svg *ngIf="!isLoading()" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+          <svg *ngIf="isLoading()" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+  </div>
+</div>

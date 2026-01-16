@@ -1,0 +1,46 @@
+<div class="bg-black/30 rounded-lg p-3 border border-white/10 transition-all duration-300">
+    @if (!showSettings()) {
+        <!-- Weather Display -->
+        <div class="flex items-center justify-between animate-fade-in-fast">
+            @if (isLoading()) {
+                <div class="w-full text-center text-gray-400 text-sm">Loading weather...</div>
+            } @else if(weatherData(); as data) {
+                 <div class="flex items-center space-x-3">
+                    <svg *ngIf="data.icon === 'sun'" class="h-8 w-8 text-yellow-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <svg *ngIf="data.icon === 'moon'" class="h-8 w-8 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    <svg *ngIf="data.icon === 'cloud'" class="h-8 w-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                    <svg *ngIf="data.icon === 'rain'" class="h-8 w-8 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a4 4 0 00-4-4h-1.337a5.002 5.002 0 00-9.326-1.55 4 4 0 00-1.255 7.85 4 4 0 00.708 7.695A4 4 0 009 18h6a4 4 0 004-4zM9 14l-1 2m6-2l-1 2" /></svg>
+                    <div>
+                        <h3 class="font-bold text-lg leading-tight">{{ data.temperature }}°</h3>
+                        <p class="text-xs text-gray-400">{{ data.location }}</p>
+                    </div>
+                </div>
+                <p class="text-sm font-semibold">{{ data.condition }}</p>
+            }
+        </div>
+    } @else {
+        <!-- Settings View -->
+        <div class="animate-fade-in-fast">
+            <h3 class="text-sm font-semibold mb-2">Weather Settings</h3>
+            <div class="flex items-center space-x-2">
+                <input 
+                    type="text" 
+                    [(ngModel)]="zipCodeInput"
+                    placeholder="Enter Zip Code" 
+                    class="flex-grow bg-black/40 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-transparent text-sm">
+                <button (click)="saveSettings()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-md text-sm font-semibold">Save</button>
+            </div>
+             <p class="text-xs text-gray-500 mt-2">Leave blank to auto-detect location.</p>
+        </div>
+    }
+</div>
+
+<style>
+  @keyframes fade-in-fast {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in-fast {
+    animation: fade-in-fast 0.2s ease-out;
+  }
+</style>
