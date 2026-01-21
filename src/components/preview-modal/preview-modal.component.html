@@ -1,0 +1,48 @@
+@if (visible() && file()) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-8 animate-fade-in" (click)="onClose()">
+  <div class="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] rounded-xl border border-white/20 shadow-2xl flex flex-col w-full max-w-4xl max-h-full overflow-hidden" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 bg-black/20 border-b border-white/10">
+      <div class="flex items-center space-x-3 text-white">
+        <svg *ngIf="file()?.icon === 'image'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+        <svg *ngIf="file()?.icon === 'typescript'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3.5 5.5a.5.5 0 01.5-.5h2a.5.5 0 010 1h-1.5v4a.5.5 0 01-1 0v-4H6a.5.5 0 01-.5-.5zm4.5 2a.5.5 0 000-1h-2a.5.5 0 000 1h2z" clip-rule="evenodd" /></svg>
+        <svg *ngIf="file()?.icon === 'css'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3.5 5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
+        <span class="font-semibold text-lg">{{ file()?.name }}</span>
+      </div>
+      <button (click)="onClose()" class="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-grow overflow-auto p-6 bg-black/40 flex items-center justify-center min-h-[300px]">
+      @if (file()?.type === 'IMAGE' && file()?.previewUrl) {
+        <img [src]="file()?.previewUrl" alt="{{file()?.name}}" class="max-w-full max-h-[70vh] rounded-lg shadow-lg object-contain">
+      } @else if (file()?.content) {
+        <pre class="w-full h-full text-gray-300 font-mono text-sm overflow-auto p-4 bg-black/30 rounded-lg border border-white/5 whitespace-pre-wrap">{{ file()?.content }}</pre>
+      } @else {
+        <div class="text-center text-gray-500">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+             <p>No preview available for this file type.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="p-3 bg-black/20 border-t border-white/10 flex justify-between text-xs text-gray-400">
+        <span>{{ file()?.size }}</span>
+        <span>Modified: {{ file()?.dateModified }}</span>
+    </div>
+  </div>
+</div>
+}
+
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+</style>

@@ -8,6 +8,8 @@ export interface FileItem {
   icon: string;
   children?: FileItem[];
   syncStatus?: 'synced' | 'syncing' | 'error';
+  content?: string;
+  previewUrl?: string;
 }
 
 export interface Drive {

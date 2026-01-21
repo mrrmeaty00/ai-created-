@@ -14,6 +14,7 @@ export class FileViewComponent {
 
   currentPath = input.required<string[]>();
   folderOpened = output<string>();
+  previewFile = output<FileItem>();
   contextMenu = output<{ mouseEvent: MouseEvent, file: FileItem | null }>();
 
   files = computed(() => this.fsService.getContents(this.currentPath()));
@@ -21,6 +22,12 @@ export class FileViewComponent {
 
   sortColumn = signal('name');
   sortDirection = signal<'asc' | 'desc'>('asc');
+
+  // Preview Logic
+  hoveredFile = signal<FileItem | null>(null);
+  selectedFile = signal<FileItem | null>(null);
+  mousePosition = signal<{x: number, y: number}>({x: 0, y: 0});
+  private hoverTimeout: any;
   
   onDoubleClick(file: FileItem) {
     if (file.type === 'FOLDER') {
@@ -28,8 +35,51 @@ export class FileViewComponent {
     }
   }
 
+  onSingleClick(file: FileItem) {
+    this.selectedFile.set(file);
+  }
+
   onContextMenu(event: MouseEvent, file: FileItem | null) {
+    if (file) {
+        this.selectedFile.set(file);
+    }
     this.contextMenu.emit({ mouseEvent: event, file });
+  }
+
+  onMouseEnter(event: MouseEvent, file: FileItem) {
+    this.updateMousePosition(event);
+    
+    // Clear any pending timer
+    if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+    }
+
+    // Start delay timer (1 second)
+    this.hoverTimeout = setTimeout(() => {
+        this.hoveredFile.set(file);
+    }, 1000);
+  }
+
+  onMouseLeave() {
+    // Cancel timer if mouse leaves before timeout
+    if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+    }
+    this.hoveredFile.set(null);
+  }
+
+  onMouseMove(event: MouseEvent) {
+    this.updateMousePosition(event);
+  }
+
+  updateMousePosition(event: MouseEvent) {
+    // Pass raw coordinates; CSS will handle the offset to show "above"
+    this.mousePosition.set({ x: event.clientX, y: event.clientY });
+  }
+
+  onPreviewClick(event: MouseEvent, file: FileItem) {
+    event.stopPropagation();
+    this.previewFile.emit(file);
   }
 
   changeSort(column: string) {

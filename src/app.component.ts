@@ -5,6 +5,7 @@ import { AiPanelComponent } from './components/ai-panel/ai-panel.component';
 import { ContextMenuComponent } from './components/context-menu/context-menu.component';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
 import { VaultModalComponent } from './components/vault-modal/vault-modal.component';
+import { PreviewModalComponent } from './components/preview-modal/preview-modal.component';
 import { FileSystemService } from './services/file-system.service';
 import { AiIntegrationService } from './services/ai-integration.service';
 import { FileItem, CloudProvider, AiProvider } from './types';
@@ -13,7 +14,7 @@ import { FileItem, CloudProvider, AiProvider } from './types';
   selector: 'app-root',
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SidebarComponent, FileViewComponent, AiPanelComponent, ContextMenuComponent, LoginModalComponent, VaultModalComponent],
+  imports: [SidebarComponent, FileViewComponent, AiPanelComponent, ContextMenuComponent, LoginModalComponent, VaultModalComponent, PreviewModalComponent],
 })
 export class AppComponent {
   fsService = inject(FileSystemService);
@@ -37,6 +38,11 @@ export class AppComponent {
   });
 
   vaultModalVisible = signal(false);
+  
+  previewModalState = signal<{visible: boolean, file: FileItem | null}>({
+    visible: false,
+    file: null
+  });
 
   get currentSelection(): string {
     const path = this.currentPath();
@@ -89,6 +95,10 @@ export class AppComponent {
     const newPath = [...this.currentPath(), folderName];
     this.navigateTo(newPath);
   }
+  
+  onPreviewFile(file: FileItem) {
+    this.previewModalState.set({ visible: true, file });
+  }
 
   onContextMenu(event: { mouseEvent: MouseEvent, file: FileItem | null }) {
     event.mouseEvent.preventDefault();
@@ -113,6 +123,11 @@ export class AppComponent {
       case 'delete':
         if (file) {
           this.fsService.deleteItem(path, file.name);
+        }
+        break;
+      case 'preview':
+        if (file) {
+            this.onPreviewFile(file);
         }
         break;
     }

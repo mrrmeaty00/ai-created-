@@ -77,6 +77,7 @@
           <app-file-view 
             [currentPath]="currentPath()" 
             (folderOpened)="onFolderOpened($event)"
+            (previewFile)="onPreviewFile($event)"
             (contextMenu)="onContextMenu($event)">
           </app-file-view>
         </div>
@@ -124,4 +125,10 @@
     (close)="vaultModalVisible.set(false)"
     (unlocked)="onVaultUnlocked()">
   </app-vault-modal>
+
+  <app-preview-modal
+    [visible]="previewModalState().visible"
+    [file]="previewModalState().file"
+    (close)="previewModalState.set({visible: false, file: null})">
+  </app-preview-modal>
 </div>
